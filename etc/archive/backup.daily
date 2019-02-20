@@ -1,0 +1,55 @@
+#!/bin/bash
+# backup.daily backup of all new files since tape backup
+# v1 backup each weekday, with rsync and hardlinks
+# v2 use catalog to generate .catalog/new
+# v3 link-dest is relative to dest
+# v4 algor: backup if ctime and not in tapeL0 (new), or mtime (mod)
+# v5 purge day#/ to avoid tweaking permissions on linked files
+# v6 multiple Dest
+# note: day{1,2,3,4,5,6,7} should exist at $Dst
+configured=no
+if [ "$configured" != "yes" ]; then echo "$0: not configured"; exit -1; fi
+
+Src=/data
+Dest="/backup challenger-191::ac"
+When="January 20, 2017"
+# hint: a few days before   ls -l /var/lib/amanda/gnutar-lists
+
+Name=$( basename $0 )
+Log=/var/log/$Name.log
+Day=$( date +%u )
+# day dest
+DayD="day$Day"
+# day prev
+DayP="day$(( ($Day+5)%7+1 ))"
+Cat=$Src/.catalog
+Parm="--stats"
+# this path is relative to $Dst
+Link="--link-dest=../$DayP"
+
+
+#[[ files-from
+# v4 algor: backup if ctime and not in tapeL0 (new), or mtime (mod)
+# remove leading and trailing / from tape list in cr:/var/lib/amanda/full/index/*/*/
+# zcat 20*.gz | sed 's|^/||; s|/$||' | sort > $Cat/tapeL0
+secs=$(( $(date '+%s') - $(date '+%s' -d "$When") ))
+days=$(( secs / 86400 ))
+
+Sed="s|^$Src/*||"
+find $Src/ -type f | sed "$Sed" | sort > $Cat/all
+find $Src/ -type f -a -mtime -$days | sed "$Sed" | sort > $Cat/mod
+find $Src/ -type f -a -ctime -$days | sed "$Sed" | sort > $Cat/ctime
+comm -2 -3 $Cat/ctime $Cat/tapeL0 > $Cat/new
+cat $Cat/mod $Cat/new | sort -u > $Cat/fifr
+#]] files-from
+
+# v6 multiple Dest
+for Dst in $Dest; do 
+  echo -n "=== "
+  date 
+  # v5 purge day#/ to avoid tweaking permissions on linked files
+  rsync -a --delete --existing --ignore-existing . $Dst/$DayD
+  echo rsync -a --files-from=$Cat/fifr $Parm $Link $Src/ $Dst/$DayD 
+  rsync -a --files-from=$Cat/fifr $Parm $Link $Src/ $Dst/$DayD 
+done &>> $Log
+

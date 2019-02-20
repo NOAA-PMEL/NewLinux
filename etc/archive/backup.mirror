@@ -1,0 +1,30 @@
+# backup to local mirror
+# v2 trim _recovery_
+configured=no
+if [ "$configured" != "yes" ]; then echo "$0: not configured"; exit -1; fi
+
+Src=/data0
+Dst=/data1
+Params="--backup --backup-dir=_recovery_"
+
+Name=$( basename $0 )
+Log=/var/log/$Name.log
+
+(
+echo
+echo -n "=== "
+date
+echo " == mirror $Src to $Dst"
+
+if [ ! -d $Src ]; then echo "$0: ($Src) Src not found"; exit -1; fi
+
+# trim old _recovery_
+cd $Dst
+if [ -d _recovery_ ]; then
+  tar czf _recovery_.tgz _recovery_ && rm -rf _recovery_
+fi
+
+rsync -a --delete --stats $Params $Src/ $Dst
+) >> $Log
+
+

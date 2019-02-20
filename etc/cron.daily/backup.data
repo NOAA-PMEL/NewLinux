@@ -1,0 +1,64 @@
+#!/bin/bash
+# backup.data: daily backup of all new files since tape backup
+# orig: backup.data.v10
+# v11 backup each weekday, with rsync and hardlinks
+# v12 use catalog to generate .catalog/new
+# v13 link-dest is relative to dest
+# v14 algor: backup if ctime and not in tapeL0 (new), or mtime (mod)
+# v15 purge day#/ to avoid tweaking permissions on linked files
+# v16 multiple Dest
+# v17 purge better than v15, use .conf file
+# v18 algor: backup if not in tapeL0 (new), or mtime (mod)
+# v19 sort order, default is not LC_COLLATE=C when run from cron
+if [[ -r $0.conf ]]; then source $0.conf; else echo $0: missing .conf; exit 1; fi
+# .conf sets these vars: Src Dest When
+
+Name=$( basename $0 )
+Log=/var/log/$Name.log
+# day of week
+Day="$( date +%u )"
+# day dest, today
+DayD="day$Day"
+# day prev, yesterday
+DayP="day$(( ($Day+5)%7+1 ))"
+Cat=$Src/.catalog
+Parm="--stats"
+# this path is relative to $Dst
+Link="--link-dest=../$DayP"
+# sort order to match root interactive shell environ
+export LC_COLLATE=C
+
+# notes:
+# remove leading and trailing / from backup list, and sort
+#  backup lists in challenger:/var/lib/amanda/full/index/*/*/
+# LC_COLLATE=C zcat 20*.gz | sed 's|^/||; s|/$||' | sort > $Cat/tapeL0
+# day{1,2,3,4,5,6,7} should exist at $Dst
+
+# calculate days since tape backup
+secs=$(( $(date '+%s') - $(date '+%s' -d "$When") ))
+days=$(( secs / 86400 ))
+
+# check if backup list is sorted v19
+if ! sort -C $Cat/tapeL0; then
+  sort $Cat/tapeL0 > $Cat/tmp
+  /bin/mv -f $Cat/tmp $Cat/tapeL0
+fi
+
+# use sed to remove leading pathname from find
+Sed="s|^$Src/*||"
+# v18 algor: backup if not in tapeL0 (new), or mtime (mod)
+find $Src/ -type f | sed "$Sed" | sort > $Cat/all
+find $Src/ -type f -a -mtime -$days | sed "$Sed" | sort > $Cat/mod
+comm -2 -3 $Cat/all $Cat/tapeL0 > $Cat/new
+cat $Cat/mod $Cat/new | sort -u > $Cat/fifr
+
+# v16 multiple Dest, ac and e2 store on local and cr backup
+for Dst in $Dest; do 
+  echo -n "=== "
+  date 
+  # v17 purge day#/ to avoid tweaking permissions on linked files
+  rsync -a --exclude='*' --delete-excluded $Src/ $Dst/$DayD
+  echo rsync -a --files-from=$Cat/fifr $Parm $Link $Src/ $Dst/$DayD 
+  rsync -a --files-from=$Cat/fifr $Parm $Link $Src/ $Dst/$DayD 
+done &>> $Log
+

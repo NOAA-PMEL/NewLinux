@@ -1,0 +1,10 @@
+## /etc/cron.daily/backup.data.conf
+# backup date in form "yyyy-mm-dd" or "6 weeks ago"
+Id="ac"
+Date="2016-06-09"
+#Dest="/backup/$Id"
+Dest="161.55.191.3::$Id"
+Src="/data"
+#Items="ANT EA EPR GLOC MAR ONRSN Qphone WISPR archive programs scroll users"
+#FindSpec="-type d -path users/haver -prune"
+#RsyncSpec=

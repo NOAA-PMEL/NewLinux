@@ -1,0 +1,5 @@
+[centos]
+name=CentOS $releasever - $basearch
+baseurl=http://mirror.centos.org/centos/6/os/x86_64/
+enabled=0
+gpgcheck=0

@@ -1,0 +1,39 @@
+#!/bin/bash
+# v1 check disk temps, from v3 smartctl disk check
+# v2 set RAID in .conf
+if [[ -r $0.conf ]]; then source $0.conf; else echo $0: missing .conf; exit 1; fi
+
+# reporting
+# 194 Temperature_Celsius     0x0002   206   206   000    Old_age   Always       -       29 (Min/Max 21/39)
+awkS='
+/^194 /{printf "%d = %s ", $10, $2 }
+'
+
+# SATA or PATA
+Sata=$( smartctl --scan-open | awk '/sat/{print $1}')
+
+# RAID controllers
+# LSI sat+megaraid,12 /dev/sda
+# 3ware 3ware,1 and 9750 /dev/twl0, 9650 /dev/twa0
+
+echo == smart: looking at temps on $( hostname )
+
+if which sensors; then sensors; fi
+if [[ -n "$Sata" ]]; then echo SATA $Sata; fi
+if [[ -n "$Rtype" ]]; then echo RAID $Rtype $Rdev; fi
+
+## non-raid
+for i in $Sata; do
+  out=$( smartctl -d sat -A $i | awk "$awkS" )
+  if [[ -n $out ]]; then
+    echo "$out SATA disk $i"
+  fi
+done
+
+## raid
+for (( j=0; j<30; j++ )); do
+  out=$( smartctl -d $Rtype,$j -A $Rdev | awk "$awkS" )
+  if [[ -n "$out" ]]; then
+    echo "$out on disk $Rtype,$j $Rdev"
+  fi
+done

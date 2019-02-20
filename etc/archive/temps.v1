@@ -1,0 +1,68 @@
+#!/bin/bash
+# v1 check disk temps, from v3 smartctl disk check
+
+# reporting
+# 194 Temperature_Celsius     0x0002   206   206   000    Old_age   Always       -       29 (Min/Max 21/39)
+awkS='
+/^194 /{printf "%d = %s ", $10, $2 }
+'
+
+# SATA or PATA
+Sata=$( smartctl --scan-open | awk '/sat/{print $1}')
+
+# RAID controllers
+# LSI sat+megaraid,12 /dev/sda
+# 3ware 3ware,1 and 9750 /dev/twl0, 9650 /dev/twa0
+
+# drivers find cards during boot
+Raid=$( 
+cat /var/log/dmesg | egrep '^scsi[0-9]' | 
+  while read scsi sep line; do
+    case "$line" in
+      (LSI*MegaRAID*) 
+        # LSI so find an associated sd line
+        echo 'sat+megaraid'
+        # strip 'scsi' off front leaving digit
+        sd=${scsi#scsi}
+        disk=$( cat /var/log/dmesg | egrep "^sd $sd" | cut -f3 -d' ' )
+        # strip off []
+        echo "/dev/${disk:1:3}"
+        ;;
+      (3w-sas*) 
+        # 9750
+        echo 3ware
+        echo /dev/twl$((x97++))
+        ;;
+      (3ware*) 
+        # 9690 9650 9550
+        echo 3ware
+        echo /dev/twa$((x9X++))
+        ;;
+    esac
+  done )
+
+echo == smart: looking at temps on $( hostname )
+
+if which sensors; then sensors; fi
+if [[ -n "$Sata" ]]; then echo SATA $Sata; fi
+if [[ -n "$Raid" ]]; then echo RAID $Raid; fi
+
+## non-raid
+for i in $Sata; do
+  out=$( smartctl -d sat -A $i | awk "$awkS" )
+  if [[ -n $out ]]; then
+    echo "$out SATA disk $i"
+  fi
+done
+
+## raid
+if [[ -n "$Raid" ]]; then set $Raid; else exit; fi
+while [[ $# > 0 ]]; do
+  Type=$1; shift; Rdev=$1; shift
+  for (( j=0; j<30; j++ )); do
+    out=$( smartctl -d $Type,$j -A $Rdev | awk "$awkS" )
+    if [[ -n "$out" ]]; then
+      echo "$out on disk $Type,$j $Rdev"
+    fi
+  done
+done

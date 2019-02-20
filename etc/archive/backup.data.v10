@@ -1,0 +1,103 @@
+#! /bin/bash
+# v10 keep a copy of all files since the last full shelf archive
+
+if [[ -r $0.conf ]]; then source $0.conf; else exit 1; fi
+# .conf sets these vars: Id Date Dest Src Items Params  (see NOTES below)
+
+Name=$( basename $0 )
+Log=/var/log/$Name.log
+Tmp=/tmp/$Name.$Id
+
+
+### Parameters
+
+RsyncP="-a --super $Params"
+# -print0 | --from0 is safer for strange file names, but not human readable
+
+# no lock files
+FindP="-not -name \*.sr.lock"
+
+
+### Main
+cd $Src || exit 1
+mkdir -p $Tmp
+
+(
+echo
+echo -n "=== "
+date
+echo " == archive date $Date"
+echo " == backup $Items from $Id:$Src to $Dest"
+
+# use latest catalog, if more than one
+catalog=$( ls .catalog/catalog* | tail -1 )
+if [[ ! -r "$catalog" ]]; then 
+  # simple case, no archive catalog, backup all files
+  echo " == no catalog"
+  find . $FindP > $Tmp/files
+else 
+  # backup with archive catalog
+  # sort order can be changed by updates, make sure cat is sorted
+  cat $catalog | sort > $Tmp/cat
+
+  # all files
+  find $Items $FindP | sort > $Tmp/all
+  # files newer than archival back date
+  find $Items $FindP -newermt $Date | sort > $Tmp/new
+  # files older than archival back date
+  comm -2 -3 $Tmp/all $Tmp/new > $Tmp/old
+  # some old files are not in the archive catalog, oops
+  comm -2 -3 $Tmp/old $Tmp/cat > $Tmp/uncat
+  # backup: old files not in catalog (uncat) + new files
+  cat $Tmp/new $Tmp/uncat > $Tmp/files
+
+  ## quality checks
+  # files in catalog but not current 
+  comm -2 -3 $Tmp/cat $Tmp/all > $Tmp/missing
+  # files in catalog but new
+  comm -1 -2 $Tmp/cat $Tmp/new > $Tmp/updated
+
+
+  # files archived but now deleted or updated
+  if [[ -s "$Tmp/missing" ]]; then
+    missed=$( cat $Tmp/missing | wc -l )
+    echo " !! $missed files & dirs were archived but now missing"
+  fi
+  if [[ -s "$Tmp/updated" ]]; then
+    updated=$( cat $Tmp/updated | wc -l )
+    echo " !! $updated files & dirs were archived but now updated"
+  fi
+  mv $Tmp/missing .catalog
+  mv $Tmp/updated .catalog
+
+  # bookkeeping
+  current=.catalog/current.$Id
+  mv $Tmp/all $current
+  rsync $RsyncP $current $catalog $Dest
+
+fi
+
+# remove deleted files from backup
+rsync -i $RsyncP --ignore-existing --existing --delete $Items $Dest
+# update and add new + not-in-catalog
+rsync -i $RsyncP --files-from=$Tmp/files --stats . $Dest
+
+) >> $Log
+
+exit
+
+
+### NOTES
+## .catalog/catalog.b3d0.2015-04-09 - must be sorted
+## FindP="-not -name \*.sr.lock" find dir1 dir2 dir3 $FindP | sort > cat
+##  or  vi   :g/sr.lock$/d   1G   !Gsort
+
+## /etc/cron.daily/backup.data.conf
+# backup date in form "yyyy-mm-dd" or "6 weeks ago"
+#Id="b3d0"
+#Date="2015-04-09"
+#Dest="161.55.191.40::$Id"
+#Src="/data0"
+#Items="analysis notes silo users"
+#Params="--backup --backup-dir=_recovery_"
+

@@ -1,0 +1,25 @@
+#!/bin/bash
+# backup.mirror backup to local mirror
+# v1 backup each weekday, with rsync and hardlinks
+configured=no
+if [ "$configured" != "yes" ]; then echo "$0: not configured"; exit -1; fi
+
+Src=/data0
+Dst=/data1
+
+Day="day$( date +%u )"
+Parm="--stats"
+Name=$( basename $0 )
+Log=/var/log/$Name.log
+
+if [ -d "$Dst/__prev/" ]; then
+  Lnk="--link-dest=$Dst/__prev/"
+else
+  Lnk=""
+fi
+
+echo rsync -a --delete "$Lnk" "$Parm" "$Src/" "$Dst/$Day/"
+rsync -a --delete "$Lnk" "$Parm" "$Src/" "$Dst/$Day/"
+rm -f "$Dst/__prev"
+ln -s "$Dst/$Day" "$Dst/__prev"
+

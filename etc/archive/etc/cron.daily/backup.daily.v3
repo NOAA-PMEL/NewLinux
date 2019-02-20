@@ -1,0 +1,38 @@
+#!/bin/bash
+# backup.weekday backup of all new files since tape backup
+# v1 backup each weekday, with rsync and hardlinks
+# v2 use catalog to generate .catalog/new
+# v3 link-dest is relative to dest
+# note: day{1,2,3,4,5,6,7} must exist at $Dst
+
+configured=no
+Src=/data
+Dst=/backup
+#Dst=challenger-191::b3d0
+When="January 1, 2017"
+# hint: a few days before   ls -l /var/lib/amanda/gnutar-lists
+
+Day=$( date +%u )
+# day dest
+DayD="day$Day"
+# day prev
+DayP="day$(( ($Day+5)%7+1 ))"
+Cat=$Src/.catalog
+Parm="--stats"
+# path relative to $Dst
+Link="--link-dest=../$DayP"
+
+Name=$( basename $0 )
+Log=/var/log/$Name.log
+if [ "$configured" != "yes" ]; then echo "$0: not configured"; exit -1; fi
+
+{
+echo -n "=== "
+date 
+. /etc/cron.daily/catalog $Src "$When" $Cat 
+echo rsync -a --delete --existing --ignore-non-existing $Src/ $Dst/$DayD 
+rsync -a --delete --existing --ignore-non-existing $Src/ $Dst/$DayD
+echo rsync -a --files-from=$Cat/new $Parm $Link $Src/ $Dst/$DayD 
+rsync -a --files-from=$Cat/new $Parm $Link $Src/ $Dst/$DayD 
+} &>> $Log
+

@@ -1,0 +1,46 @@
+#!/bin/bash
+# backup.sys - etc root home usr/local
+# v1 parents are backup.sys.v4 and backup.data.v5
+# note: day{1,2,3,4,5,6,7} should exist at $Dst
+configured=yes
+if [ "$configured" != "yes" ]; then echo "$0: not configured"; exit -1; fi
+
+Src="/etc /root /home /usr/local"
+# ventstore 161.55.192.7
+if ping -c 1 161.55.191.7 >/dev/null ; then
+  Svr="161.55.191.7"
+else
+  Svr="161.55.192.7"
+fi
+
+Host=$( hostname -s )
+Name=$( basename $0 )
+Log=/var/log/$Name.log
+Dst=$Svr::$Host
+
+Day=$( date +%u )
+# day dest
+DayD="day$Day"
+# day prev
+DayP="day$(( ($Day+5)%7+1 ))"
+
+RsyncP="--super --stats"
+RsyncP="$RsyncP --filter=hide_.mozilla/ --filter=hide_.cache/"
+# this path is relative to $Dst
+RsyncP="$RsyncP --link-dest=../$DayP"
+
+# copy /@ (links in /) to /root
+mkdir -p /root/.backup-of-slash-links
+find / -maxdepth 1 -type l | \
+  rsync -a --delete --files-from=- / /root/.backup-of-slash-links
+
+{
+  echo -n "=== "
+  date 
+  # purge day#/ to avoid tweaking changes to linked files
+  rsync -a --exclude='*' --delete-excluded $Src/ $Dst/$DayD
+  echo rsync -ai $RsyncP $Src $Dst/$DayD 
+  rsync -ai $RsyncP $Src $Dst/$DayD 
+} &>> $Log
+
+

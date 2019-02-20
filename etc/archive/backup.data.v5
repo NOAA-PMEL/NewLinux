@@ -1,0 +1,47 @@
+#! /bin/bash
+# v5 keep a copy of all files since the last full shelf archive
+
+if [[ -r $0.conf ]]; then 
+  source $0.conf 
+else
+  exit 1
+  # date of shelf archive "yyyy-mm-dd" or "6 weeks ago"
+  # BACKDATE="2015-01-01"
+  # BACKDEST="/backup"
+  # BACKSRC="/data0/*"
+  # give full path names here, multiple SRC dirs are OK
+fi
+
+Host=$( hostname -s )
+Name=$( basename $0 )
+Log="/var/log/$Name.log"
+
+(
+echo -n "=== "
+if [ -n "$BACKDATE" ]; then echo -n "from $BACKDATE to " ; fi
+date
+
+### Parameters
+
+RsyncP="-ai --super --backup --backup-dir=_recovery_ --from0"
+# print0 | from0 is safe for strange file names
+FindP="-print0"
+if [[ -n "$BACKDATE" ]]; then FindP="-newermt $BACKDATE $FindP"; fi
+# prune away .junk
+FindP="-type d -name .cache -prune -o $FindP"
+FindP="-type d -name .mozilla -prune -o $FindP"
+
+for src in $BACKSRC; do
+  if [[ ! -d $src ]]; then echo " == no $src"; continue; fi
+  echo " == $src"
+  dir=$( dirname $src )
+  base=$( basename $src )
+  cd $dir
+
+  # update and add new, remove deleted 
+  find $base $FindP | rsync $RsyncP --files-from=- --stats . $BACKDEST
+  rsync $RsyncP --ignore-existing --existing --delete $base $BACKDEST
+done
+
+echo 
+) >> $Log

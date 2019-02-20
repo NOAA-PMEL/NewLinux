@@ -1,0 +1,60 @@
+#!/bin/bash
+# v3 smartctl disk check
+# v4 set RAID in .conf
+if [[ -r $0.conf ]]; then source $0.conf; else echo $0: missing .conf; exit 1; fi
+
+# smartctl -A -d sat+megaraid,12 /dev/sda
+# smartctl -A -d 3ware,1 /dev/twa0 # 9650 
+# smartctl -A -d 3ware,1 /dev/twl0 # 9750 
+
+# reporting
+# 5 Reallocated_Sector_Ct, 9 Power_On_Hours, 10 Spin_Retry_Count,
+# 197 Current_Pending_Sector, 198 Offline_Uncorrectable
+awkS='
+/^  5 /{if ($10 > 0) printf "%d = %s ", $10, $2 }
+/^ 10 /{if ($10 > 0) printf "%d = %s ", $10, $2 }
+/^194 /{if ($10 > 36) printf "%d = %s ", $10, $2 }
+/^197 /{if ($10 > 0) printf "%d = %s ", $10, $2 }
+/^198 /{if ($10 > 0) printf "%d = %s ", $10, $2 }
+/^  9 /{x=$10/24/365; if (x > 4) printf "(%1.1f years) ", x }
+'
+
+# quickie
+if [[ -n "$1" ]]; then
+  echo "== $1"
+  out=$( smartctl -d sat -A $1 | awk "$awkS" )
+  if [[ -n $out ]]; then
+    echo "$out SATA disk $1"
+  fi
+  exit
+fi
+  
+
+# figure out disks
+# smartctl --scan for AT disks, dmesg scsi# for raid controllers
+# could use lsblk
+
+# SATA or PATA
+Sata=$( smartctl --scan-open | awk '/sat/{print $1}')
+
+# hello
+echo == smart: looking for sector errs on $( hostname )
+if [[ -n "$Sata" ]]; then echo SATA $Sata; fi
+if [[ -n "$Rtype" ]]; then echo RAID $Rtype $Rdev; fi
+
+## non-raid
+for i in $Sata; do
+  out=$( smartctl -d sat -A $i | awk "$awkS" )
+  if [[ -n $out ]]; then
+    echo "$out SATA disk $i"
+  fi
+done
+
+## raid
+for (( j=0; j<30; j++ )); do
+  out=$( smartctl -d $Rtype,$j -A $Rdev | awk "$awkS" )
+  if [[ -n "$out" ]]; then
+    echo "$out on disk $Rtype,$j $Rdev"
+  fi
+done
+

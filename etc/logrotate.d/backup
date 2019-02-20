@@ -1,0 +1,6 @@
+/var/log/backup.sys.log {
+	missingok
+}
+/var/log/backup.data*.log {
+	missingok
+}

@@ -1,0 +1,42 @@
+# .1 all writeable in samba, rw controlled on unix side
+# .1.1 this allows setting one dir writable temporarily
+# .1.2 most dirs will be readonly on unix side, so set group rw when writable
+# .1.3 most will be owned by root, group = valid users
+# .2 users dir self owned
+# .2.1 smaller umask, owner=rw group=r
+
+[global]
+        workgroup = PMEL
+        realm = pmel.noaa.gov
+        security = domain
+        server signing = auto
+	local master = no
+
+        writeable = yes
+        create mode = 0664
+        directory mode = 0775
+
+;       log level = 2
+
+[homes]
+        comment = User Directories
+        path = /data/users/%S
+        browseable = no
+        force create mode = 0640
+        force directory mode = 0750
+
+[users]
+        comment = other peoples homes
+        path = /data/users
+        valid users = @users
+
+[deep]
+        comment = Challenger Deep Data
+        path = /data/deep
+        valid users = @challenger
+
+[analysis]
+        comment = Analysis rw
+        path = /data/analysis
+        valid users = @cr
+

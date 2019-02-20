@@ -1,0 +1,12 @@
+## /etc/cron.daily/backup.data.conf
+echo "backup.data: Not Configured"; exit -1
+
+# backup date in form "yyyy-mm-dd" or "6 weeks ago"
+Date="2015-04-09"
+Src="/data0"
+Items="analysis notes silo users"
+Id="b3d0"
+Dest="161.55.191.40::$Id"
+Params=""
+#Dest=/data1/backup"
+#Params="--backup --backup-dir=_recovery_"

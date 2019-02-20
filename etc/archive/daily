@@ -1,0 +1,705 @@
+Fri, Jun 12, 2015  3:35:24 PM
+.1 clear new office
+.2 clear terminal
+.2.1 ^L in bash 
+.2.2 to clear screen and scrollback
+alias cls='echo -e "\033c"'
+
+Mon, Mar 02, 2015  9:34:00 AM
+.0 2do
+.0.1 x excess transport 
+.0.2 x vet for rosa giardia
+.0.3 x finish smart check
+.0.4 order for embfile2, UPS batts
+.0.5 ups batts from dave, bobD
+.1 excess to jonathan via BillC
+BillC is on his way to seattle leaving early afternoon today, monday.
+He is carrying the following, for delivery to you.
+
+MACMINI-4507B5, mac mini,	cd0001699472
+pioneer, supermicro 1U, cd0001524762
+yoga, dell optiplex 745, cd0001699451
+xerox phaser 6280, cd0001529302
+hard disks, 6x3.5, 2x2.5
+reel tapes, 2
+
+The hard drives and reel tapes are not wiped. The mac mini hard disk is wiped seven times per DoD. 
+The printer may have a hard drive embedded? i don't know. Moving printer needs a hand cart.
+
+In an open box with the mac, tapes, disks, there is a smaller box with the UPS LAN cards marked Not For Excess.
+
+I will start excess tickets on the items with property labels.
+
+.2 haru, CAC card expiring
+/e/ >patty.george@n can you answer this?
+/e/ <pg: Haru needs to get in contact with his Trusted Agent
+/e/ <klay: thomas.peltzer@noaa.gov
+.3 struggle to get raid identified for smart, also bash.
+cannot set variables in a pipeline, must echo to get data out.
+in a $( ) environ, must use open( for case pattern).
+now have cron.daily/smart on all systems. 
+.3.1 v yang realloc > 100
+.4 replace 2T in bioac2 for embfile raid5 backup
+ # tw_cli /c1/u0 start rebuild disk=7
+ or just wait a while
+
+Tue, Mar 03, 2015  9:08:38 AM
+.0 2do
+.0.1 x notify yang, disk going down
+.0.2 review auto email
+.0.3 v 2nd backup of e2
+.0.4 v backup problem on syspc
+.0.5 * move backup.sys to weekly
+.0.6 hourly checks to alert email
+.0.7 v open tickets
+.0.8 x change daily backup on e2 to /backup
+.0.9 x check permission/owner in cron.*
+.0.10 x fix backup.data backup.sys (exclude .cache, print0, take out -u)
+.-.4 o order for embfile2, UPS batts
+.-.5 ups batts from dave, bobD
+
+.1 restore of b2:/data1 failed, ECC err
+.1.1 delete /c1/u0, copy again (takes 36 hrs?)
+.2 syspc backup 
+.2.1 lots of files with embedded ^M from merle
+.2.2 some from others (e.g. fowler)
+.2.3 rsync --files-from fails these files
+.2.4 FindP="-print0", RsyncP+="--from0"
+.3 backup.data /home optimization not working
+.3.1 oh, is not part of backup.sys - should be
+.3.2 optimized backup.sys
+.3.3 backup.* excludes .cache, .mozilla
+.4 backup improves
+.4.1 make backup.data run last
+.4.2 backup.sys -R full paths
+.4.3 cron.weekly trim _recovery_ by one month
+.5 removed kklinck from all
+
+Wed, Mar 04, 2015 10:51:58 AM
+.0 2do
+.0.1 x backup.sys _filter, -R
+.0.2 x review auto email
+.0.3 v 2nd backup of e2
+.0.4 merle file names embedded ^M
+.0.5 v open tickets
+.0.6 ups batts from dave, bobD
+
+.1 0.1
+
+Thu, Mar 05, 2015  3:05:23 PM
+.1 another disk dropped from bioac2, p8
+.1.1 replacement checked smartctl
+.1.2 cleaned parted mktable gpt (wipes last block)
+.1.3 made no diff, still cycled u? -> u1 ... /c1/u1 del ... /u0 rebuilding
+.1.4 rebuild at 18% / hr, should be rebuilt tomorrow. intact? ecc err?
+.2 proposed portal exception to nancy, cost & 2nd system & avail
+.3 
+
+.1 sara power supply busted
+.2 billC new cac card
+.2.9 update AD user->account->userlogon 10 digit number = DoD ID
+
+Mon, Mar 09, 2015 12:19:34 PM
+.1 /e/ andy. data not flowing on syspc
+.1.1 /e/ bill. on their end
+.1.2 mostly fixed, gap missing
+.2 lupton needs sw installed. coreldraw, grapher6, surfer8 (9 had bad serial#)
+.3 ventstore
+.3.1 archive of old PC backups on 4TB bioac:2 external
+.3.2 /home incomplete, do a recopy
+.3.3 bad 1.5T
+.3.4 move all to data2 and rebuild data1 as raid6 (it is bigger)
+.3.5 then do data2-> raid6
+.4 sara now is admin on her pc
+.4.1 holger isn't
+.4.2 local_admin==cnsd
+.5 switch e2 to /backup
+.5.1 changes to exports, smb
+.5.2 umount /mdisk /mdata
+.6 b3 errs
+.6.1 failing memory?
+.6.2 
+Mar  2 03:46:23 bioac3 kernel: {20}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Mar  2 03:46:23 bioac3 kernel: {20}[Hardware Error]: It has been corrected by h/w and requires no further action
+Mar  2 03:46:23 bioac3 kernel: {20}[Hardware Error]: event severity: corrected
+Mar  2 03:46:23 bioac3 kernel: {20}[Hardware Error]:  Error 0, type: corrected
+Mar  2 03:46:23 bioac3 kernel: {20}[Hardware Error]:  fru_text: CorrectedErr
+Mar  2 03:46:23 bioac3 kernel: {20}[Hardware Error]:   section_type: memory error
+Mar  2 03:46:23 bioac3 kernel: [Firmware Warn]: error section length is too small
+.6.3 no, that's a disk err. probable misuse of smartctl
+
+Tue, Mar 10, 2015 11:53:09 AM
+.1 conference
+.1.1 several big names
+.1.2 added 5 systems to visitor lan
+.1.3 conf room phone needs phone card outbound 541.867.0123
+.2 merle arcgis
+.2.1 purging all signs of arc/esri and reinstall
+.2.2 
+.3 hammac
+.3.1 boxed, no disks
+.3.2 v ticket
+.3.3 jonathon address
+NOAA PMEL Bldg 3
+7600 Sand Point Way NE
+Seattle, WA 98115
+.4 small rack UPS
+.4.1 replaced all batts, but looks like just one was bad
+.4.2 recalibrate both - bottom may be ok
+.4.3 one bad batt. 6 of 8 batteries 12.75, one 13.0, one 11.75
+.4.4 new batts had wider tabs, fit original wiring
+.5 how to clear pending_sectors from a disk
+.5.1 complete overwrite of disk
+.5.2 # blockdev --getsz /dev/sdd; dd if=/dev/zero of=/dev/sdd bs=1G count=1864
+
+Wed, Mar 11, 2015  9:16:08 AM
+.1 ventstore: updates after overnight take forever
+.1.1 Let it be one day out of date
+.1.2 windows image backup is huge change nightly, it must modify files in place
+.1.3 testing --inplace for speedup, avoids file copy but can't be stopped
+.1.4 50% speedup on a large chunk, still takes a long time
+.1.5 no backups tonight
+.1.5.1 updates and reboot from seattle
+.1.5.2 shutting off vs:samba
+.1.5.3 rsync inplace should be done before end of day
+.1.5.4 rebuild as raid6 tonight
+.2 embfile is happy
+.2.1 less than 1/3 of space being used
+.2.2 35% initialized, but loaded all data
+.2.3 ready for changeover thursday
+.3 bioac has these weird future files
+.3.1 /datasilo/Ano_Nuevo/2012/Deployments/2012_03_27_SEALB_5062_TAG3/DSG1156/000/0006.DSG
+.3.2 /users/Fregosi/BaleenBackup/2015_03_05/MiroungaBackup/2015_02_12/eseals.datasilo/Deployments/2012_03_27_SEALB_5062_TAG3/DSG1156/000/0006.DSG
+.3.3 both files are from 2037
+
+Thu, Mar 19, 2015  2:54:47 PM
+.1 embfile backup 
+.1.1 raid5 today on 9650
+.1.2 didn't bother to trim it back to 15/3/1 because it all fit
+.1.3 no bad sectors
+.2 bioac3 new backup
+.2.1 may need to be trimmed to fit (even back to 1/1?)
+.2.2 squeeze users analysis notes in wherever
+.2.3 all new data is on datasilo
+.2.4 how did it fit on the old disk set?
+.3 chad: sync web files every 15m
+.3.1 bbtt@ec:$(lastyear/4)Cory&Ball
+.3.2 added crontab /usr/local/bin/sync_now\! eoi
+.3.3 note - cnsd@syspc crontab cnsd_crontab/cron_jobs/sync_rsn_graphs/do_rsync
+
+Fri, Mar 20, 2015  8:48:58 AM
+.1 yang flashplayer
+.1.1  http://www.tecmint.com/adobe-flash-player-11-3-realsed-install-on-rhel-centos-6-5-and-fedora-17-12/
+ #  rpm -ivh http://linuxdownload.adobe.com/adobe-release/adobe-release-x86_64-1.0-1.noarch.rpm
+ #  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-adobe-linux
+ #  yum update
+ #  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-adobe-linux
+ #  yum install flash-plugin nspluginwrapper alsa-plugins-pulseaudio libcurl
+
+Mon, Mar 23, 2015  9:52:32 AM
+.1 embfile raid5 7/7 put in storage. Yay!
+.2 redo of bioac
+.2.1 ds is on 12 disk R5, no room for hot spare
+.2.2 silo, users tight fit onto 8xR5
+.2.2.1 built on 9550, but remount on 9650 if needed with hot spare
+.2.2.2 ds+anal fits on 11xR5, allowing hot spare
+
+Wed, Mar 25, 2015  9:21:57 AM
+.1 backup puzzle - raid6 on 10 disk of data?
+.2 disk refurb for Pending_Sector
+.2.1 full write didn't work, why?
+.2.2 read finds errs, overwrite twice cleared an error
+.2.2.1 continue
+ # dd if=/dev/sdd of=/dev/null bs=1MB skip=895400 
+.2.2.2 read noerror, would that report bad block # and continue?
+
+rsync -ai --stats --super /data1/datasilo 161.55.191.40::b2 &>~/ds.rsync.log &
+dd if=/dev/sdd of=/dev/null bs=1MB skip=1000000 &
+
+.3 activate sudo on all, so i don't have root shells all the time
+.3.1 take centrify off of caldera
+
+Thu, Mar 26, 2015 11:49:08 AM
+.3 smarter smart
+.3.1 wikipedia for smart says fail indic by 05,10,197,198
+.3.2 distribute new file
+ $ tar vcf tar/etc.tar etc                                                       
+ $ for i in $( cat all.sys ); do scp tar/etc.tar $i: 2> /dev/null; done
+ $ for i in $( cat all.sys ); do echo == $i; ssh -t $i sudo \
+    tar -C/ --no-same-owner -xvf ~kahn/etc.tar etc/cron.daily/smart ; done
+.4 bad UDMA on archive
+.4.1 just added UDMA_CRC to smart, disk2 on archive has count 80
+.4.2 still initializing (78%) so change it tomorrow
+.4.3 can it rebuild while loading? i think yes, now half loaded and 3/4 init
+.4.4 no, wiki does not include udma as disk critical. wassup?
+.4.5 udma means bad cable, not failing disk, small # is fine
+
+Fri, Mar 27, 2015 11:11:52 AM
+.2 sharon to b3
+.2.1 several disconnects
+.2.2 first ping tests showed slow ping return (>5s) 2%?
+.2.3 better test
+rm ping*out; \
+for ((j=0; j<(3*24*60); j++)); do \
+  for i in crabeater musculus station3 brutal; do \
+    ( date "+%X %x"; ping -c 60 -q $i )>> ping-$i.out & \
+  done >& /dev/null; \
+sleep 60; done &
+
+Mon, Mar 30, 2015 12:03:17 PM
+.1 bioac3 backup
+.2 sat disk rehab
+.3 usb3 not recognized in ventstore, brutal
+.4 identify components
+.4.1 identify motherboard
+ # wmic baseboard get product,Manufacturer,version,serialnumber
+.5 dot updates
+.5.1 bashrc prompt for xterm title bar (already in linux)
+.5.2 path corrected if parts missing
+.5.3 dot.tar trimmed
+.6 ventstore PCbackup getting full
+.6.1 name all the old backup sets (e.g. keep latest one)
+ # cd /data1/PCbackup
+ # old=$( for i in *; do ls -1dt $i/*/Back* 2>/dev/null | sed -e '1{d}'; done )
+.6.2 copy olds to external
+ # echo "$old" | while read line; do du -s "$line"; done | awk '{sum+=$1} END {print sum}'
+ # echo "$old" | while read line; do rsync -Rai "$line" /mnt; done 
+.6.3 remove olds
+ # echo "$old" | while read line; do rm -rf "$line" ; done 
+
+Tue, Mar 31, 2015  9:48:47 AM
+.1 successful restore from image on he3
+.1.1 clonezilla he3 as well, to ventstore
+.2 turn off sysimage after stable
+.2.1 maybe periodically to get new sw install
+.2.2 saves much time, ensures good image
+.2.3 spreadsheet image date
+ # ls -1d /data1/PCbackup/*/WindowsImageBackup/*/Back*
+.3 finished cpio of old stuff
+.3.1 use --.6.2 instead of this, dates wrong
+ # echo "$old" | while read line; do \
+  find "$line" -print0 | cpio -0dp /data2/PCbackup/; done
+.3.2 good enough. moving to external 4TB
+
+Wed, Apr 01, 2015 11:47:24 AM
+.1 rebuild he3
+.2 manage VS space
+.3 restore musc
+.4 copy glider data
+.4.1 selene has slow usb2 w/ esata
+.4.2 nserver recognized esata w/o reboot (ns1 did not)
+.4.3 3 hrs instead of 6 hrs - big deal
+.5 printing from station3
+.5.1 cups
+.5.1.1 allow remote admin, use gui
+.5.1.2 cupsctl
+ # cupsctl --remote-admin
+.5.2 print to syspc
+ ipp://161.55.192.31:631/printers/Xerox
+
+Thu, Apr 02, 2015  1:09:49 PM
+.1 musculus
+.1.1 not stalled, but restore taking insanely long
+.1.2 doing fresh install, sidebar restore just in case
+.2 systeminfo
+.2.1 see when this windows was installed
+.2.2 also some HW (cards), CPU, memory
+.2.3 find := grep
+ c:> systeminfo | find -i 'install date'
+ c:> wmic os get InstallDate
+.2.4 note - command prompt rtclick=copyHighlight, rtclick=paste
+
+Fri, Apr 03, 2015 12:33:39 PM
+.1 tests
+.1.1 ventstore: /home=38MB/s usb2=41MB usb3=65MB raid=300MB
+.1.2 newpserv: esata=80MB/s net=50MB
+
+Sun, Apr 05, 2015  9:32:36 AM
+.1 survey
+.1.1 collecting info
+wmic share get
+wmic cpu get name,socketdesignation
+wmic baseboard get manufacturer,product
+wmic csproduct get name,identifyingnumber
+\\newpserv\users\public\CrystalDiskInfo6_2_1\DiskInfo.exe
+.2 reboot all linux except ventstore
+.2.1 note - weird errs re soft raid not found oerdftp
+.3 sata2 x4 pcix silicon image si3124 - doesn't see any disks?
+.3.1 also have many sata1 (150) pci x2 cards
+.3.1.1 silicon image sata150 PCI is USB slow, 80MB/s vs 800MB motherboard
+.3.2 note - cable just barely reaches, hard to replace
+.3.3 upgrade bioac2 mbd from embfile2, use 9650-8 (pcie-4) from ventstore
+.3.4 9650-12 from e2 to vs
+ # lspci | grep 3124
+02:01.0 RAID bus controller: Silicon Image, Inc. SiI 3124 PCI-X Serial ATA Controller (rev 02)
+
+Mon, Apr 06, 2015 10:49:39 AM
+.1 new office?
+.2 idl
+.2.1 idl s3
+.2.1.1 look fof old install
+.2.1.2 
+.2.1.3 
+ # rpm -q --qf '%{NAME}' util-linux-ng-2.17.2-12.18.el6.x86_64
+.2.2 idl for bob
+.2.2.1 humm
+.2.2.2 
+.3 b3 archive
+.3.1 ds loaded w/ new glider, just barely fit raid6 10+2 98%
+.3.2 si us an no onto R6 8+2
+
+Tue, Apr 07, 2015  8:44:15 AM
+.1 b3 bup si us an no
+.1.1 close to full, 97%
+.1.2 human
+ $ df -B1GB /b2
+ $ du -B1GB -sc analysis/ notes/ silo/ users/  
+.2 disks, PC
+.2.1 check capacity
+C:> wmic /node:crabeater LOGICALDISK GET Name,Size,FreeSpace
+FreeSpace    Name  Size
+35562364928  C:    1000097181696
+0            D:    0
+.2.2 2.5" saves up to 200KWh over lifetime ($20)
+.2.3 750G caviar black looks good, $63, 5yr warranty
+
+
+Wed, Apr 08, 2015 11:02:43 AM
+.1 migrate r5 -> r6
+.1.1 3% after 12 hours. Fail!
+.1.2 many pending, relocated on hitachi
+.1.3 redo of acdata (10.9TB) on Raid6x8 (12T) 
+.2 printer linux
+.2.1 fail to vector thru syspc, but direct is easy
+ ipp://trichromatic/ipp/
+ generic, Generic PostScript Printer Foomatic/Postscript (end of list)
+
+pending ...
+put c: mirror on nserver1
+remove 2tb from newpserv
+pull 4 disks from ac b3 e2 
+disks tight pack in 4boxes - 4TB air seal and desiccant
+batteries for 350 ES x ?
+new disks for PCs
+RMA 3 disks
+
+Sun, Apr 12, 2015 10:36:35 AM
+.1 e2 archive
+.1.1 one good drive was dropped, forgot timeout=70
+.1.2 raid6 built, much slower while initializing
+.2 test r6 expand
+.2.1 b2 raid6 minimum (5 drives)
+.2.2 after initialize, add one. then add another.
+.2.3 3xR6 (12T) init @ 12%/hr (8 hrs)
+.3 /backup on ac e2
+.3.1 change date vi /etc/cron.daily/backup.data.conf
+.4 sw audit
+.4.1 auto from nserver1 
+C:\> wmic /node:brutal product get name,version /format:csv > sw.csv
+
+Mon, Apr 13, 2015  8:42:16 AM
+.1 r6 migrate
+.1.1 [root@bioac2 08:39:32 /home/kahn]
+ # tw_cli /c1/u1 migrate type=raid6 disk=5
+1% / hr, 8 days to add disk
+.1.2 try bad disk during migrate
+.1.3 bad disk takes us to broken state - DANGER
+
+Tue, Apr 14, 2015  9:27:33 AM
+.1 r6 migrate
+.1.1 does migrate of two disks take longer? 100hrs not so bad for 16T add
+.1.2 17% / day, 6 days
+.2 disk safety
+.2.1 osu pc mildly infected (spyware, coupons), recommend reinstall
+.2.2 brutal registry NoDrive* values <= ff (one was 91)
+.2.3 noaa disk formatted (clean), save data from lap, scan for virus
+.2.4 dann cutter installs free malwarebytes on osu to augment MS Sec'ty Ess'ls
+.3 pwd keeper
+.3.1 security expert uses 1password, recommends lastpass
+.4 win pwd ,->'
+
+
+[root@bioac2 09:25:43 /home/kahn]
+ # tw_cli /c1/u1 migrate type=raid6 disk=5-6
+
+strange place on google docs. tried to open file, google asked "pull from trash
+or open home page" and now i see a bunch of ?jon shared files?
+https://docs.google.com/document/u/1/
+
+Thu, Apr 16, 2015  2:20:00 PM
+.1 move quake to rsf100
+.2 WD RMA #: 85969530
+Qty   	Product No. 	Serial No. 	Made in 	Value
+(Customs purposes only)
+1   	WD4000F9YZ-09N20L1 	WMC5D0D1CD0L 	Malaysia 	215.00
+1   	WD4000F9YZ-09N20L1 	WMC5D0DA42PK 	Malaysia 	215.00
+.3 hgst rma
+Serial number: 	  	PCJYNDDS 	 
+ 
+
+Below is your RMA number and information that you need to return your hard disk drive. You should receive an email confirmation with the same information within one hour.
+
+RMA number: 38045137
+Zip code/postal code you entered: 97365
+The zip code/postal code listed above is required to "Check RMA status"
+
+Please be aware that you may experience a delay in receiving your replacement disk drive based on stock availability. If product is available, your replacement order will be processed within 14 working days after the receipt of your defective disk drive.
+
+Please write the RMA number on the outside of your package when returning to HGST . Send the hard disk drive to the following address:
+
+  	HGST, Inc.
+  	c/o UPS Supply Chain Solutions
+  	North America Logistics Center
+  	11811 Landon Drive
+  	MIRA LOMA CA 91752
+  	UNITED STATES
+Tel No.   	1-510-476-4000
+
+.4 Bill memory, 16GB for mac
+.4.1 install ez
+.4.2 initial results positive
+
+Fri, Apr 17, 2015 11:16:09 AM
+.1 general cleanup
+.2 archive
+.2.1 flawed re deletes and moves in archive space
+.2.2 catalog of pre-archive
+.3 migrate at 64%, finishing over weekend
+.4 put together vidcart, no output, fail
+
+Mon, Apr 20, 2015  8:38:52 AM
+.1 jonathan visit
+.1.1 moving servers
+.1.1.1 tall server racks. folder, re APC power
+.1.2 bonding 2-4GB lines for general access
+.1.3 2790 switch in 110 and machinery room
+.2 migrate
+.2.1 done over weekend, now 18T 7x4TB-raid6
+.2.2 test adding one more - last two at once were slightly quicker than first
+[root@bioac2 10:24:26 /home/kahn]
+ # tw_cli /c1/u1 migrate type=raid6 disk=7
+Sending migration message to /c1/u1 ... Done.
+
+u1    Migrator  MIGRATING      -       3%      -       18626.4   RiW    ON
+Mon Apr 20 13:57:04 PDT 2015
+u1    Migrator  MIGRATING      -       5%      -       18626.4   RiW    ON
+Mon Apr 20 16:37:07 PDT 2015
+u1    Migrator  MIGRATING      -       22%     -       18626.4   RiW    ON
+[root@bioac2 03:35:41 /home/kahn]
+3:33 for 3%, 6:12 for 5%, ~ 1:12=1%
+.3 O
+
+Mon, Apr 27, 2015  4:32:48 PM
+.1 waik is a lot of work
+.2 lo4d.com for sw downloads, good policy
+
+Wed, Apr 29, 2015  9:47:34 AM
+.1 virtualbox exhibit
+.1.1 win2000 installs fine, vbox extensions has high res screen, sound OK
+.1.2 how to get existing install to new load?
+.2 adobe sign
+.2.1 haru tried to digital sign remote access, adobe err
+.2.2 no room in existing container?
+.2.3 print and sign
+.3 exhibit
+.3.1 copied disk using sysinternals\disk2vhd, using ICH9 on all, vbox drivers
+.3.2 ran exhibit from existing disk, sound is crappy but full volume
+.3.2.1 w2k-sp2 qt=6 
+.3.2.2 ran the same with qt=6.5.2 (newest qt running on sp2)
+.3.2.3 ran fine with sp4+rollup and qt=7.1.6
+.3.3 fresh copy of win2000 + sp4 + rollup + qtime7.1.6, Admin\MyDocs\kiosk6 exc
+.3.4 fresh copy of winxp64 + sp2 + qtime7.55, kiosk6 excellent
+.3.4.1 Admin:chadwick, cnsd:weather
+
+Thu, Apr 30, 2015 10:39:50 AM
+.1 fup /--.3/
+.1.1 fill in document gaps /--/
+.1.2 copy os with sp4, rollup, new quicktime to IDE HD
+.1.3 test of disk pulled, wasn't working completely in exhibit
+.1.3.1 no problems in disk check, copy into VM worked same as backup disk
+.1.3.2 why was it failing? either marginal power or dust buildup overheating?
+.1.3.3 why not working right now? failing audio HW or speaker? -> try updates
+.2 review mail/auto
+.2.1 mar27 acoustic: 44 = UDMA_CRC_Error_Count  on disk 3ware,9 /dev/twl0
+.2.2 sudden, no incidents since. 
+.2.2.1 there was an insert of disks apr09
+.2.2.2 no cause identified
+
+Tue, May 05, 2015 10:37:51 AM
+.1 e2 upgrade
+.2 ppoint codec
+.2.1 bobE problems
+.2.2 download winff frontend to ffmpeg (linux/win/mac)
+http://winff.org https://code.google.com/p/winff/ 
+
+Thu, May 28, 2015  4:28:10 PM
+.1 xming
+.1.1 putty
+.1.1.1 centrify for smart card ssh, putty settings
+ ssh.auth.kerberos:v-Attempt,o-username_portion, ssh.x11:v-Forwarding
+.1.1.2 std
+ data:Autologin:username ssh.x11:v-Forwarding
+.1.2 server side /etc/centrifydc/ssh/sshd_config
+ X11Forwarding yes
+
+.2 mbsystem build 5.5
+[notes/Merle/mbsystem]
+.2.1 corrections from developer
+.2.2 repeatable process: no interrupt during build, versioned
+.3 mbsys holes
+[notes/Merle/munge-esf]
+.3.1 scripts to count action types, remove action:3
+.2.3 use rpm, build mbsys+gmt+netcdf
+
+Thu, Jun 04, 2015  9:13:07 AM
+.1 bioac2 - mapping tw_cli units to sd
+.1.1  what is who?
+ # yum install lsscsi
+[root@bioac2 09:16:39 /etc/yum.repos.d]
+ # tw_cli /c0 show
+
+Unit  UnitType  Status         %RCmpl  %V/I/M  Stripe  Size(GB)  Cache  AVrfy
+------------------------------------------------------------------------------
+u0    SINGLE    OK             -       -       -       3725.28   RiW    ON
+u1    RAID-0    OK             -       -       256K    7450.56   RiW    ON
+u3    SINGLE    OK             -       -       -       3725.28   RiW    ON
+u4    SINGLE    OK             -       -       -       3725.28   RiW    ON
+
+Port   Status           Unit   Size        Blocks        Serial
+---------------------------------------------------------------
+p0     NOT-PRESENT      -      -           -             -
+p1     NOT-PRESENT      -      -           -             -
+p2     NOT-PRESENT      -      -           -             -
+p3     NOT-PRESENT      -      -           -             -
+p4     OK               u4     3.63 TB     7814037168    PK1338P4GT2PTB
+p5     OK               u1     3.63 TB     7814037168    WD-WMC5D0D7UAV4
+p6     OK               u1     3.63 TB     7814037168    WD-WMC5D0D5YPXP
+p7     NOT-PRESENT      -      -           -             -
+p8     NOT-PRESENT      -      -           -             -
+p9     OK               u3     3.63 TB     7814037168    PK1334PCJYR8WS
+p10    OK               u0     3.63 TB     7814037168    PK1334PCJA4XRS
+p11    NOT-PRESENT      -      -           -             -
+
+[root@bioac2 09:16:45 /etc/yum.repos.d]
+ # lsscsi
+[0:0:0:0]    disk    AMCC     9650SE-12M DISK  4.10  /dev/sda
+[0:0:1:0]    disk    AMCC     9650SE-12M DISK  4.10  /dev/sdd
+[0:0:3:0]    disk    AMCC     9650SE-12M DISK  4.10  /dev/sdf
+[0:0:4:0]    disk    AMCC     9650SE-12M DISK  4.10  /dev/sdg
+[2:0:0:0]    cd/dvd  Slimtype DVD A  DS8A5S    WP52  /dev/sr0
+[3:0:0:0]    disk    ATA      ST980825AS       3.06  /dev/sdb
+
+.2 e2 gis-data
+.2.1 add joe with rw for gis
+.2.2 new groups gis_write and gis_read (was geo, geoplus)
+.2.3 rw access needs be in both groups
+.3 xerox toner
+.3.1 cyan compatible - replace before old runs out?
+.3.2 current levels 
+.3.2.1 front panel status
+CMYK 80% 60% 80% 40%
+.3.2.2 161.55.192.55 properties->supply assistant (at bottom)
+Page Count:	14342
+Date	Time: 	06/03/2015	22:29
+Component	Current Level
+Black Toner [K]		3200
+Yellow Toner [Y]	4800
+Magenta Toner [M]	3600
+Cyan Toner [C]		4800
+Waste Toner Box		30000
+Imaging Unit Kit	48000
+
+.4 bad usb ports
+.4.1 /e/ sharon. bad ports for sharon, selene. expensive?
+.4.2 mbd usb ports?
+C:\Users\Administrator.PMEL>wmic /node:crabeater baseboard get product,Manufactu
+rer,version,serialnumber
+Manufacturer  Product     SerialNumber     Version
+ASRock        B85 Killer  E80-3B021100356
+C:\Users\Administrator.PMEL>wmic /node:baleen baseboard get product,Manufacturer
+,version,serialnumber
+Manufacturer  Product       SerialNumber     Version
+ASRock        Z97 Extreme4  E80-48028600191
+.4.2.1 
+
+Fri, Jun 05, 2015  8:39:16 AM
+.1 all day figuring out how to tell if someone is actively using pc
+.1.1 who is logged on?
+ c:> wmic /node:$comp  computersystem get username
+ ps> wmic /node:$comp  computersystem get username
+.1.2 is console locked?
+ c:> wmic /node:$comp process | find "LogonUI"
+ ps> wmic /node:$comp process | select-string "LogonUI"
+.1.3 disk size
+ c:> wmic /node:crabeater diskdrive get index,size
+.2 powershell for server scripting
+.3 removed 8x1.5T from bioac2
+ put in a box in parts
+.4 mounted backup on e2 ac (simple raid0)
+.5 bioac2 still for b3 backups
+ future test of restore procedure
+
+Tue, Jun 09, 2015  9:01:06 AM
+.1 sonny
+.1.1 cac-enforced
+.1.2 cache cac for kahn, elevated
+.1.3 turn on remote
+ ps> wmic /node:"sonny" rdtoggle get AllowTSConnections
+ ps> wmic /node:"sonny" rdtoggle where AllowTSConnections="0" call SetAllowTSConnections "1"
+.1.4 updates
+.1.5 sonny allows non-priv to change registry, wmic, etc
+.2 script to query
+.2.1 cygstart cmd /c will start a windows shell, for getting passwd
+ $ cygstart cmd /c "wmic /user:administrator /node:$1 process > $tmp"
+
+Mon, Jun 15, 2015 12:39:58 PM
+.1 manatee
+.1.1 haru, alex want installs on mana and moving it to matt's office
+.1.2 cables in matt's?
+.2 ross, intern for joe
+.2.1 no windows logon, is security class req'd?
+.2.2 using station1 offline
+.2.2.1 andy says idl license is standalone
+.2.2.2 copy data to s1
+.2.2.3 create bypass user in 
+.3 andy on caldera
+.3.1 vnc for pixmaps
+.3.2 https://www.howtoforge.com/vnc-server-installation-centos-6.5
+  yum install tigervnc-server tigervnc
+  chkconfig vncserver on
+  su lau -s /usr/bin/vncpasswd
+  su kahn -s /usr/bin/vncpasswd
+  vi /etc/sysconfig/vncservers
+VNCSERVERS="2:lau 3:kahn"
+VNCSERVERARGS[2]="-geometry 1024x768 -nolisten tcp -localhost"
+VNCSERVERARGS[3]="-geometry 1024x768 -nolisten tcp -localhost"
+  service vncserver restart
+  vi ~lau/.vnc/xstartup
+comment out xinit lines, change twm to mwm
+.3.3 usage
+  xterm -e ssh -L 5902:localhost:5902 caldera &
+  vncviewer :5902 &
+
+Wed, Jun 17, 2015 11:06:18 AM
+.1 move office
+.1.1 new keyboard
+mouse wheel click broke, move middle to left outer
+keyboard ESC is tiny, map shift lock to esc?
+.1.2 cygwin man broken
+.1.2.1 cygcheck -c found incomplete packages, reinstalled
+.1.3 problems with mouse cut paste
+
+Thu, Jun 18, 2015  5:00:07 PM
+.1 gophone $97 Blu Studio 5.0 II Smartphone 
+.2 att unlock request 2017932051
+Unlock request number: 2017932051
+Thank you for contacting AT&T about unlocking your mobile device.
+Congratulations! Here are your unlock instructions:
+Your unlock code is: 56529504
+1. Power off the device and remove the AT&T SIM card.
+2. Insert non-AT&T SIM card.
+3. Power on the device. Wait a few moments, allowing the device to fully power-up
+4. Enter the unlock code when prompted.
+5. Press OK. The device is unlocked.
+Note: You are allowed five attempts to unlock before your device permanently locks to the AT&T network.
+Questions? Please call 800.331.0500, or dial 611 from your AT&T wireless phone.

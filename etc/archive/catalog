@@ -1,0 +1,21 @@
+#!/bin/bash
+# catalog [Src ["When" [Where]]]
+# hint, a few days before:   ls -l /var/lib/amanda/gnutar-lists
+
+Src=/data
+When="January 1, 2017"
+Where=$Src/.catalog
+
+# cmd line arg?
+if [ $# -gt 0 ]; then Src=$1; fi
+if [ $# -gt 1 ]; then When=$2; fi
+if [ $# -gt 2 ]; then Where=$3; fi
+
+if [ ! -d $Where ]; then mkdir -p $Where || exit; fi
+
+secs=$(( $(date '+%s') - $(date '+%s' -d "$When") ))
+days=$(( secs / 86400 ))
+
+find $Src/ | sed "s;^$Src/*;;" > $Where/all
+echo "find $Src/ -ctime -$days -o -mtime -$days | sed \"s;^$Src/*;;\" > $Where/new"
+find $Src/ -ctime -$days -o -mtime -$days | sed "s;^$Src/*;;" > $Where/new

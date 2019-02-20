@@ -1,0 +1,32 @@
+#!/bin/bash
+# backup.weekday backup of all new files since tape backup
+# v1 backup each weekday, with rsync and hardlinks
+
+configured=no
+Src=/data
+Dst=/backup
+When="January 1, 2017"
+# hint: a few days before   ls -l /var/lib/amanda/gnutar-lists
+
+if [ "$configured" != "yes" ]; then echo "$0: not configured"; exit -1; fi
+
+Day="day$( date +%u )"
+Parm="--stats"
+Name=$( basename $0 )
+Log=/var/log/$Name.log
+
+if [ -d "$Dst/__prev/" ]; then
+  Parm="$Parm --link-dest=$Dst/__prev/"
+fi
+if [ ! -d "$Dst/$Day" ]; then 
+  mkdir -p $Dst/$Day
+fi
+
+find $Src/ -newermt "$When" | sed "s;$Src/;;" > $Src/.catalog/newermt
+echo rsync -a --delete --existing --ignore-non-existing $Src/ $Dst/$Day
+rsync -a --delete --existing --ignore-non-existing $Src/ $Dst/$Day 
+echo rsync -a --files-from=$Src/.catalog/newermt $Parm $Src/ $Dst/$Day
+rsync -a --files-from=$Src/.catalog/newermt $Parm $Src/ $Dst/$Day &>> $Log
+
+rm -f $Dst/__prev
+ln -s $Dst/$Day $Dst/__prev

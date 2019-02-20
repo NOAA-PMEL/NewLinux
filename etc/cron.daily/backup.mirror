@@ -1,0 +1,31 @@
+#!/bin/bash
+# backup.mirror backup of all files 
+# note: day{1,2,3,4,5,6,7} must exist at $Dst
+
+configured=no
+Src=/data0
+Dst=/data1
+#Dst=challenger-191::b3d0
+
+Day=$( date +%u )
+# day dest
+DayD="day$Day"
+# day prev
+DayP="day$(( ($Day+5)%7+1 ))"
+Parm="--stats"
+# path relative to $Dst/$DayD
+Link="--link-dest=../$DayP"
+
+Name=$( basename $0 )
+Log=/var/log/$Name.log
+if [ "$configured" != "yes" ]; then echo "$0: not configured"; exit -1; fi
+
+{
+echo -n "=== "
+date 
+. /etc/cron.daily/catalog /data0
+rsync -a --exclude='*' --delete-excluded $Src/ $Dst/$DayD
+echo rsync -a $Parm $Link $Src/ $Dst/$DayD 
+rsync -a $Parm $Link $Src/ $Dst/$DayD 
+} &>> $Log
+

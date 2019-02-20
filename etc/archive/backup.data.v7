@@ -1,0 +1,80 @@
+#! /bin/bash
+# v7 keep a copy of all files since the last full shelf archive
+
+if [[ -r $0.conf ]]; then 
+  source $0.conf 
+else
+  exit 1
+  # date of shelf archive "yyyy-mm-dd" or "6 weeks ago"
+  # BACKDATE="2015-01-01"
+  # BACKDEST="/backup"
+  # BACKSRC="/data0/*"
+  # give full path names here, multiple SRC dirs are OK
+fi
+
+Host=$( hostname -s )
+Name=$( basename $0 )
+Log="/var/log/$Name.log"
+
+(
+echo -n "=== "
+if [ -n "$BACKDATE" ]; then echo -n "from $BACKDATE to " ; fi
+date
+
+### Parameters
+
+RsyncP="-ai --super --backup --backup-dir=_recovery_"
+# -print0 | --from0 is safe for strange file names, but doesn't match catalog
+FindP="-not -name \*.sr.lock "
+# prune away .junk
+FindP="-type d -name .cache -prune -o $FindP"
+FindP="-type d -name .mozilla -prune -o $FindP"
+# no lock files
+
+
+### Main
+for src in $BACKSRC; do
+  if [[ -f $src ]]; then rsync $RsyncP $src $BACKDEST; continue; fi
+  if [[ ! -d $src ]]; then echo " == no $src"; continue; fi
+  cd $src
+
+  if [[ ! -d .catalog ]]; then 
+    # simple case, no archive catalog, backup all files
+    find . $FindP > /tmp/$$.files
+  else
+    # typical case, archival date and catalog
+    # newest catalog
+    catalog=$( ls .catalog/catalog.* | tail -1 )
+    if [[ ! -r "$catalog" ]]; then echo " == no catalog $catalog"; continue; fi
+    current=.catalog/current
+    ## params
+    if [[ -z "$BACKDATE" ]]; then BACKDATE=${catalog##.catalog/catalog.}; fi
+    # backup dirs in archive
+    dirs=$( cut -f1 -d/ $catalog | uniq )
+
+    echo " == $dirs in $src" from $BACKDATE
+
+    # files newer than archival back date
+    find $dirs $FindP -newermt $BACKDATE | sort > /tmp/$$.new
+    # files older than archival back date
+    find $dirs $FindP -not -newermt $BACKDATE | sort > /tmp/$$.old
+    # all files
+    find $dirs $FindP | sort > $current
+    # combine: old files not in catalog (uncat) + new files
+    comm -2 -3 /tmp/$$.old $catalog > /tmp/$$.uncat
+    cat /tmp/$$.new /tmp/$$.uncat > /tmp/$$.files
+    # files in catalog but not current 
+    comm -2 -3 $catalog $current > /tmp/$$.gone
+  fi
+
+  # update and add new + not-in-catalog
+  rsync $RsyncP --files-from=/tmp/$$.files --stats . $BACKDEST
+  # remove deleted files from backup
+  rsync $RsyncP --ignore-existing --existing --delete $dirs $BACKDEST
+  # files archived but now deleted
+  echo " !! $src files archived but now deleted"
+  cat /tmp/$$.gone
+done
+
+echo 
+) >> $Log

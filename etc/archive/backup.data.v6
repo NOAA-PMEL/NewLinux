@@ -1,0 +1,69 @@
+#! /bin/bash
+# v6 keep a copy of all files since the last full shelf archive
+
+if [[ -r $0.conf ]]; then 
+  source $0.conf 
+else
+  exit 1
+  # date of shelf archive "yyyy-mm-dd" or "6 weeks ago"
+  # BACKDATE="2015-01-01"
+  # BACKDEST="/backup"
+  # BACKSRC="/data0/*"
+  # give full path names here, multiple SRC dirs are OK
+fi
+
+Host=$( hostname -s )
+Name=$( basename $0 )
+Log="/var/log/$Name.log"
+
+(
+echo -n "=== "
+if [ -n "$BACKDATE" ]; then echo -n "from $BACKDATE to " ; fi
+date
+
+### Parameters
+
+RsyncP="-ai --super --backup --backup-dir=_recovery_"
+# -print0 | --from0 is safe for strange file names, but doesn't match catalog
+FindP="-print"
+# prune away .junk
+FindP="-type d -name .cache -prune -o $FindP"
+FindP="-type d -name .mozilla -prune -o $FindP"
+# no lock files
+FindP="-not -name \*.sr.lock -o $FindP"
+
+
+### Main
+for src in $BACKSRC; do
+  if [[ ! -d $src ]]; then echo " == no $src"; continue; fi
+  echo " == $src"
+  dir=$( dirname $src )
+  base=$( basename $src )
+  cd $dir
+
+  if [[ -z "$BACKDATE" ]]; then 
+    # simple case, no archive
+    find ./$base $FindP > /tmp/$Name.files
+  else
+    # typical case, archival date and catalog
+    # newest catalog
+    catalog=$( ls -t catalog.find* | head -1 )
+    if [[ ! -r "$catalog" ]]; then echo " == no catalog"; continue; fi
+    # files newer than archival back date
+    find ./$base -not -newermt $BACKDATE $FindP > /tmp/$Name.new
+    # files older than archival back date
+    find ./$base -newermt $BACKDATE $FindP | sort > /tmp/$Name.old
+    cat $catalog | sort > /tmp/$Name.cat
+    # combine: old files not in catalog + new files
+    comm -2 -3 /tmp/$Name.old /tmp/$Name.cat > /tmp/$Name.uncat
+    cat /tmp/$Name.new /tmp/$Name.uncat > /tmp/$Name.files
+  fi
+
+  # update and add new + not-in-catalog
+  rsync $RsyncP --files-from=/tmp/$Name.files --stats . $BACKDEST
+  # remove deleted files from backup
+  rsync $RsyncP --ignore-existing --existing --delete $base $BACKDEST
+done
+
+echo 
+) >> $Log

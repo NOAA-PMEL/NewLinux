@@ -1,0 +1,35 @@
+#! /bin/bash
+# v4 keep important system files for system restore
+
+Host=$( hostname -s )
+Name=$( basename $0 )
+Log=/var/log/$Name.log
+
+BACKSRC="/etc /root /home /usr/local"
+# ventstore 161.55.192.7
+if ping -c 1 161.55.191.7 >/dev/null ; then
+  BACKDEST="161.55.191.7"
+else
+  BACKDEST="161.55.192.7"
+fi
+
+RsyncP="-aiR --super --delete --stats"
+RsyncP="$RsyncP --filter=hide_.mozilla/ --filter=hide_.cache/"
+
+# nap for up to an hour - spreads out load from cron.daily
+if [ ! -t 0 ]; then sleep $(( $RANDOM / 10 )); fi
+
+
+# copy /@ (links in /) to /root
+mkdir -p /root/.backup-of-slash-links
+find / -maxdepth 1 -type l | \
+  rsync -a --delete --files-from=- / /root/.backup-of-slash-links
+
+
+(
+echo -n '=== '; date
+
+rsync $RsyncP $BACKSRC $BACKDEST::$Host
+
+echo
+) >> $Log

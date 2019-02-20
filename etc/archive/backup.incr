@@ -1,0 +1,21 @@
+#!/bin/bash
+# incremental backup after tape archival
+
+Params="--super --stats --backup --backup-dir=_recovery_"
+cd /data
+find . -newermt "January 23, 2017" > .catalog/newermt
+rsync -a --delete --files-from=.catalog/newermt $Params . challenger::ac
+exit
+
+# the following should work but doesn't on e2 and b3d1 ??
+
+
+LVL=2
+ME=ac
+DST=/cr/backup
+
+DIR=data
+cd /$DIR
+if [ ! -e .catalog/$ME-$DIR-L$((LVL-1)) ]; then echo backup.incr fail; exit; fi
+cp .catalog/$ME-$DIR-L$((LVL-1)) .catalog/$ME-$DIR-L$LVL
+tar -cf $DST/$ME-$DIR-L$LVL.tar -g .catalog/$ME-$DIR-L$LVL --level=$LVL .
